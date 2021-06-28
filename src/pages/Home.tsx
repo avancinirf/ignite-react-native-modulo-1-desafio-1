@@ -3,6 +3,10 @@ import React, { useState } from 'react';
 import { Header } from '../components/Header';
 import { MyTasksList } from '../components/MyTasksList';
 import { TodoInput } from '../components/TodoInput';
+import { Theme } from '../components/Theme';
+import { View, StyleSheet } from 'react-native';
+
+import { theme } from '../global/styles/theme';
 
 interface Task {
   id: number;
@@ -12,6 +16,8 @@ interface Task {
 
 export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [darkTheme, setDarkTheme] = useState<boolean>(false);
+  const tasksBg = darkTheme ? theme.dark.colors.tasksBg : theme.default.colors.tasksBg
 
   function handleAddTask(newTaskTitle: string) {
     //TODO - add new task if it's not empty    
@@ -41,17 +47,28 @@ export function Home() {
     setTasks(oldState => oldState.filter(e => e.id !== id));
   }
 
-  return (
-    <>
-      <Header />
+  function handleToggleTheme() {
+    setDarkTheme(!darkTheme);
+  }
 
-      <TodoInput addTask={handleAddTask} />
+  return (
+    <View style={[styles.container, { backgroundColor: tasksBg }]}>
+      <Header darkTheme={darkTheme} />
+      <Theme onPress={handleToggleTheme} darkTheme={darkTheme}/>
+      <TodoInput addTask={handleAddTask} darkTheme={darkTheme}/>
 
       <MyTasksList 
         tasks={tasks} 
         onPress={handleMarkTaskAsDone} 
         onLongPress={handleRemoveTask} 
+        darkTheme={darkTheme}
       />
-    </>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  }
+})

@@ -1,10 +1,17 @@
 import React from 'react';
 import { FlatList, TouchableOpacity, View, Text, StyleSheet, FlatListProps } from 'react-native';
 
-function FlatListHeaderComponent() {
+import { theme } from '../global/styles/theme';
+
+type Props = {
+  darkTheme: boolean;
+}
+
+function FlatListHeaderComponent({ darkTheme }: Props) {
+  const textColor = darkTheme ? theme.dark.colors.text : theme.default.colors.text;
   return (
     <View>
-      <Text style={styles.header}>Minhas tasks</Text>
+      <Text style={[styles.header, { color: textColor }]}>Minhas tasks</Text>
     </View>
   )
 }
@@ -17,9 +24,14 @@ interface MyTasksListProps {
   }[];
   onPress: (id: number) => void;
   onLongPress: (id: number) => void;
+  darkTheme: boolean;
 }
 
-export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
+export function MyTasksList({ tasks, onLongPress, onPress, darkTheme }: MyTasksListProps) {
+  const textColor = darkTheme ? theme.dark.colors.text : theme.default.colors.text;
+  const textTranslucid = darkTheme ? theme.dark.colors.textTranslucid : theme.default.colors.textTranslucid;
+  const taskMarkerDoneColor = darkTheme ? theme.dark.colors.taskMarkerDone : theme.default.colors.taskMarkerDone;
+
   return (
     <FlatList
       data={tasks}
@@ -37,18 +49,18 @@ export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
             <View 
               testID={`marker-${index}`}
               //TODO - use style prop 
-              style={!!item.done ? styles.taskMarkerDone : styles.taskMarker}
+              style={!!item.done ? {...styles.taskMarkerDone, backgroundColor: taskMarkerDoneColor} : {...styles.taskMarker, borderColor: taskMarkerDoneColor}}
             />
             <Text 
               //TODO - use style prop
-              style={!!item.done ? styles.taskTextDone : styles.taskText}
+              style={!!item.done ? {...styles.taskTextDone, color: textTranslucid} : {...styles.taskText, color: textColor}}
             >
               {item.title}
             </Text>
           </TouchableOpacity>
         )
       }}
-      ListHeaderComponent={<FlatListHeaderComponent />}
+      ListHeaderComponent={<FlatListHeaderComponent darkTheme={darkTheme}/>}
       ListHeaderComponentStyle={{
         marginBottom: 20
       }}
@@ -104,7 +116,6 @@ const styles = StyleSheet.create({
     marginRight: 10
   },
   taskTextDone: {
-    color: '#A09CB1',
     textDecorationLine: 'line-through'
   }
 })
